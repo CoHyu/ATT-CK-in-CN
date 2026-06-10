@@ -1,0 +1,20 @@
+# Source STIX data (51MB, not needed for serving)
+enterprise-attack.json
+
+# Temp extraction files
+all_desc_to_translate.json
+descs_raw.json
+groups_to_translate.json
+remaining_groups.json
+remaining_tools.json
+remaining_malware.json
+remaining_malware2.json
+tech_descs.json
+
+# Python cache
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/

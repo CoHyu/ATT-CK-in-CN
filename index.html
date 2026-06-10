@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MITRE ATT&CK 矩阵 - 中文版</title>
+<style>
+/* ===== 基础样式 ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0f1117; --surface: #1a1d27; --border: #2d3140;
+  --text: #e1e4eb; --text-secondary: #9499a3; --text-muted: #6b7080;
+  --accent: #4a9eff; --accent-dim: #2b5a8c;
+  --tactic-colors: #c6362a, #e0601c, #d4950b, #5b9e16, #179e8c, #2b9eb3, #2e7fb0, #5b5fcf, #8b5fcf, #b55fcf, #c94f6f, #c94f84, #b8473c, #9370a5, #5c8a6d;
+}
+html { font-size: 14px; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; min-height: 100vh; }
+
+/* ===== 顶部导航 ===== */
+.topnav { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+.topnav-inner { max-width: 100%; padding: 0 16px; display: flex; align-items: center; height: 48px; gap: 16px; }
+.topnav-logo { font-weight: 700; font-size: 1.1rem; color: var(--accent); white-space: nowrap; text-decoration: none; }
+.topnav-links { display: flex; gap: 6px; overflow-x: auto; }
+.topnav-links a, .topnav-links button { color: var(--text-secondary); text-decoration: none; padding: 6px 12px; border-radius: 4px; font-size: 0.85rem; white-space: nowrap; background: none; border: none; cursor: pointer; }
+.topnav-links a:hover, .topnav-links button:hover, .topnav-links a.active { color: var(--text); background: rgba(255,255,255,0.06); }
+.topnav-links a.active { color: var(--accent); }
+.topnav-search { margin-left: auto; position: relative; }
+.topnav-search input { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: 4px; width: 200px; font-size: 0.85rem; outline: none; }
+.topnav-search input:focus { border-color: var(--accent); }
+.topnav-search input::placeholder { color: var(--text-muted); }
+.search-results { display: none; position: absolute; top: 100%; right: 0; width: 400px; max-height: 400px; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; margin-top: 4px; z-index: 200; }
+.search-results.show { display: block; }
+.search-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--border); }
+.search-item:hover { background: rgba(255,255,255,0.06); }
+.search-item .id { color: var(--accent); font-weight: 600; font-size: 0.8rem; }
+.search-item .name { font-weight: 500; }
+.search-item .tactic { color: var(--text-muted); font-size: 0.75rem; }
+
+/* ===== 主内容区 ===== */
+.main-content { padding: 16px; }
+.page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; }
+.page-subtitle { color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem; }
+
+/* ===== 控制栏 ===== */
+.controls { display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+.controls button { background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
+.controls button:hover { background: rgba(255,255,255,0.08); }
+.controls button.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+
+/* ===== 矩阵视图 ===== */
+.matrix-container { overflow-x: auto; }
+.matrix { display: flex; gap: 2px; min-width: max-content; }
+.matrix-col { min-width: 170px; max-width: 220px; flex: 0 0 auto; }
+.matrix-col-header { padding: 10px 8px; border-radius: 4px 4px 0 0; color: #fff; font-weight: 700; font-size: 0.8rem; text-align: center; }
+.matrix-col-header .count { font-weight: 400; opacity: 0.8; font-size: 0.7rem; }
+.matrix-col-body { background: var(--surface); border-radius: 0 0 4px 4px; padding: 4px 0; min-height: 60px; }
+.matrix-tech { padding: 5px 8px; cursor: pointer; border-left: 3px solid transparent; margin: 1px 0; transition: background 0.1s; }
+.matrix-tech:hover { background: rgba(255,255,255,0.04); }
+.matrix-tech .tech-id { color: var(--accent); font-size: 0.7rem; font-weight: 600; }
+.matrix-tech .tech-name { font-size: 0.8rem; }
+.matrix-tech .tech-subs { color: var(--text-muted); font-size: 0.7rem; }
+.matrix-tech.has-subs { cursor: pointer; }
+.matrix-tech.has-subs .tech-subs { color: var(--accent); }
+.matrix-subtech { padding: 3px 8px 3px 16px; cursor: pointer; font-size: 0.75rem; border-left: 3px solid transparent; display: none; }
+.matrix-subtech:hover { background: rgba(255,255,255,0.04); }
+.matrix-subtech.show { display: block; }
+.matrix-subtech .tech-id { color: var(--accent-dim); font-weight: 600; font-size: 0.65rem; }
+
+/* ===== 详情面板 ===== */
+.detail-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; overflow: hidden; }
+.detail-overlay.show { display: flex; justify-content: center; align-items: center; padding: 24px 0; }
+.detail-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; width: 800px; max-width: 95vw; max-height: 90vh; overflow-y: auto; overflow-x: hidden; padding: 24px; position: relative; margin: auto; }
+.detail-panel::-webkit-scrollbar { width: 6px; }
+.detail-panel::-webkit-scrollbar-track { background: transparent; }
+.detail-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.detail-panel::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+.detail-close { position: sticky; float: right; top: 0; z-index: 10; background: var(--surface); border: none; color: var(--text-secondary); font-size: 1.4rem; cursor: pointer; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; margin: -8px -8px 0 0; }
+.detail-close:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.detail-id { color: var(--accent); font-weight: 700; font-size: 0.9rem; }
+.detail-name { font-size: 1.4rem; font-weight: 700; margin: 6px 0; }
+.detail-name-cn { color: var(--text-secondary); font-size: 1rem; }
+.detail-meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.detail-tag { background: var(--accent-dim); color: #fff; padding: 2px 8px; border-radius: 3px; font-size: 0.75rem; }
+.detail-section { margin-top: 16px; }
+.detail-section h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.detail-section .desc { font-size: 0.85rem; line-height: 1.6; overflow-wrap: break-word; word-break: break-word; }
+.detail-list { list-style: none; display: flex; flex-wrap: wrap; gap: 4px; }
+.detail-list li { background: rgba(255,255,255,0.04); padding: 4px 10px; border-radius: 3px; font-size: 0.8rem; cursor: pointer; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.detail-list li:hover { background: rgba(255,255,255,0.1); }
+.detail-panel a { word-break: break-all; }
+.detail-panel code { white-space: pre-wrap; word-break: break-all; font-size: 0.8rem; }
+
+/* ===== 组列表 ===== */
+.groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.group-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px; cursor: pointer; }
+.group-card:hover { border-color: var(--accent); }
+.group-card .gid { color: var(--accent); font-weight: 600; font-size: 0.8rem; }
+.group-card .gname { font-weight: 600; font-size: 1rem; }
+.group-card .aliases { color: var(--text-muted); font-size: 0.75rem; margin-top: 2px; }
+.group-card .gdesc { font-size: 0.8rem; margin-top: 4px; color: var(--text-secondary); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ===== 软件/缓解列表 ===== */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px; cursor: pointer; }
+.card:hover { border-color: var(--accent); }
+.card .cid { color: var(--accent); font-weight: 600; font-size: 0.75rem; }
+.card .cname { font-weight: 500; font-size: 0.9rem; }
+.card .cdesc { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ===== 统计页 ===== */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px; text-align: center; }
+.stat-card .num { font-size: 2rem; font-weight: 700; color: var(--accent); }
+.stat-card .label { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+
+/* ===== 工具提示 ===== */
+.tooltip { position: relative; }
+.tooltip::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 0.7rem; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; }
+.tooltip:hover::after { opacity: 1; }
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+  .topnav-links { display: none; }
+  .topnav-search input { width: 140px; }
+  .matrix-col { min-width: 140px; max-width: 180px; }
+}
+
+/* ===== 面包屑 ===== */
+.breadcrumb { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
+.breadcrumb a { color: var(--accent); cursor: pointer; text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+
+/* ===== 隐藏 ===== */
+.hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="topnav-logo" href="#" onclick="showView('matrix')">MITRE ATT&CK 中文版</a>
+    <div class="topnav-links" id="topnav-links">
+      <a href="#" class="active" data-view="matrix" onclick="showView('matrix')">矩阵</a>
+      <a href="#" data-view="techniques" onclick="showView('techniques')">技术</a>
+      <a href="#" data-view="subtechniques" onclick="showView('subtechniques')">子技术</a>
+      <a href="#" data-view="tactics" onclick="showView('tactics')">战术</a>
+      <a href="#" data-view="groups" onclick="showView('groups')">组织</a>
+      <a href="#" data-view="software" onclick="showView('software')">软件</a>
+      <a href="#" data-view="mitigations" onclick="showView('mitigations')">缓解</a>
+      <a href="#" data-view="stats" onclick="showView('stats')">统计</a>
+    </div>
+    <div class="topnav-search">
+      <input type="text" id="search-input" placeholder="搜索技术/组织/软件..." oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';doSearch('');this.blur();}">
+      <div class="search-results" id="search-results"></div>
+    </div>
+  </div>
+</nav>
+
+<!-- 主内容区 -->
+<div class="main-content" id="main-content">
+  <!-- 由 JS 动态渲染 -->
+</div>
+
+<!-- 详情浮层 -->
+<div class="detail-overlay" id="detail-overlay" onclick="if(event.target===this)closeDetail()">
+  <div class="detail-panel" id="detail-panel"></div>
+</div>
+
+<script src="data.js"></script>
+<script>
+// ============================================================
+// 全局状态与初始化
+// ============================================================
+const D = window.ATTACK_DATA;
+let currentView = 'matrix';
+let showSubtechniques = false;
+let selectedTactic = null;
+let detailCache = {};
+
+// 建立索引
+const techById = {};    // external_id -> technique
+const tacticByShort = {}; // shortname -> tactic
+const groupById = {};
+const malwareById = {};
+const toolById = {};
+const mitigationById = {};
+const techId2objId = {}; // external_id -> obj id
+
+(function buildIndexes() {
+  for (const t of Object.values(D.all_techniques)) {
+    techById[t.external_id] = t;
+    techId2objId[t.external_id] = t.id;
+  }
+  for (const t of D.tactics) {
+    tacticByShort[t.shortname] = t;
+  }
+  for (const g of Object.values(D.groups)) groupById[g.id] = g;
+  for (const m of Object.values(D.malware)) malwareById[m.id] = m;
+  for (const t of Object.values(D.tools)) toolById[t.id] = t;
+  for (const m of Object.values(D.mitigations)) mitigationById[m.id] = m;
+})();
+
+function getTechByExtId(extId) {
+  // search all_techniques values
+  for (const t of Object.values(D.all_techniques)) {
+    if (t.external_id === extId) return t;
+  }
+  return null;
+}
+
+// ============================================================
+// 视图切换
+// ============================================================
+function showView(view, params) {
+  currentView = view;
+  document.querySelectorAll('#topnav-links a').forEach(a => a.classList.remove('active'));
+  const link = document.querySelector(`[data-view="${view}"]`);
+  if (link) link.classList.add('active');
+  selectedTactic = null;
+
+  switch(view) {
+    case 'matrix': renderMatrix(); break;
+    case 'techniques': renderTechniqueList(); break;
+    case 'subtechniques': renderSubtechniqueList(); break;
+    case 'tactics': renderTacticList(); break;
+    case 'groups': renderGroupList(); break;
+    case 'software': renderSoftwareList(); break;
+    case 'mitigations': renderMitigationList(); break;
+    case 'stats': renderStats(); break;
+    default: renderMatrix();
+  }
+  window.scrollTo(0, 0);
+}
+
+// ============================================================
+// 矩阵视图
+// ============================================================
+function renderMatrix() {
+  const tacticColors = ['#c6362a','#e0601c','#d4950b','#5b9e16','#179e8c','#2b9eb3','#2e7fb0','#5b5fcf','#8b5fcf','#b55fcf','#c94f6f','#c94f84','#b8473c','#9370a5','#5c8a6d'];
+
+  let html = '<h1 class="page-title">Enterprise ATT&CK 矩阵</h1>';
+  html += '<p class="page-subtitle">MITRE ATT&CK 企业矩阵中文版 — 共 15 个战术、' + Object.keys(D.techniques).length + ' 项技术、' + Object.keys(D.subtechniques).length + ' 项子技术</p>';
+  html += '<div class="controls">';
+  html += '<button onclick="toggleSubtechniques()" id="btn-subs" class="' + (showSubtechniques ? 'active' : '') + '">显示/隐藏子技术</button>';
+  html += '<button onclick="expandAll()">展开全部子技术</button>';
+  html += '<button onclick="collapseAll()">折叠全部子技术</button>';
+  html += '<label style="display:flex;align-items:center;gap:4px;font-size:0.85rem;color:var(--text-secondary);cursor:pointer"><input type="checkbox" id="filter-platform-win" style="cursor:pointer"> 仅 Windows</label>';
+  html += '</div>';
+  html += '<div class="matrix-container"><div class="matrix" id="matrix-grid">';
+
+  D.matrix.forEach((col, ci) => {
+    const t = col.tactic;
+    const color = tacticColors[ci % tacticColors.length];
+    const techCount = col.techniques.length;
+    html += '<div class="matrix-col">';
+    html += `<div class="matrix-col-header" style="background:${color}" onclick="showView(\'tactics\');setTimeout(()=>showTacticDetail(\'${t.id}\'),100)">${t.name_cn}<br><span class="count">${techCount} 项技术</span></div>`;
+    html += '<div class="matrix-col-body">';
+    col.techniques.forEach(tech => {
+      const hasSubs = tech.subtechniques && tech.subtechniques.length > 0;
+      html += `<div class="matrix-tech${hasSubs ? ' has-subs' : ''}" onclick="showTechniqueDetail('${tech.external_id}')" data-extid="${tech.external_id}">`;
+      html += `<div class="tech-id">${tech.external_id}</div>`;
+      html += `<div class="tech-name">${tech.name_cn}</div>`;
+      if (hasSubs) {
+        html += `<div class="tech-subs">+${tech.subtechniques.length} 子技术 ▼</div>`;
+      }
+      html += '</div>';
+      if (hasSubs) {
+        tech.subtechniques.forEach(sub => {
+          html += `<div class="matrix-subtech" data-parent="${tech.external_id}" onclick="event.stopPropagation();showTechniqueDetail('${sub.external_id}')">`;
+          html += `<span class="tech-id">${sub.external_id}</span> ${sub.name_cn}`;
+          html += '</div>';
+        });
+      }
+    });
+    html += '</div></div>';
+  });
+
+  html += '</div></div>';
+  document.getElementById('main-content').innerHTML = html;
+  document.getElementById('filter-platform-win')?.addEventListener('change', filterPlatform);
+}
+
+function toggleSubtechniques() {
+  showSubtechniques = !showSubtechniques;
+  const subs = document.querySelectorAll('.matrix-subtech');
+  subs.forEach(s => {
+    if (showSubtechniques) s.classList.add('show');
+    else s.classList.remove('show');
+  });
+  document.getElementById('btn-subs').classList.toggle('active', showSubtechniques);
+}
+
+function expandAll() {
+  document.querySelectorAll('.matrix-subtech').forEach(s => s.classList.add('show'));
+  showSubtechniques = true;
+  document.getElementById('btn-subs')?.classList.add('active');
+}
+
+function collapseAll() {
+  document.querySelectorAll('.matrix-subtech').forEach(s => s.classList.remove('show'));
+  showSubtechniques = false;
+  document.getElementById('btn-subs')?.classList.remove('active');
+}
+
+function filterPlatform() {
+  const onlyWin = document.getElementById('filter-platform-win')?.checked;
+  document.querySelectorAll('.matrix-tech').forEach(el => {
+    const extId = el.dataset.extid;
+    const tech = techById[extId];
+    if (!tech) return;
+    if (onlyWin && !tech.platforms.includes('Windows')) {
+      el.style.display = 'none';
+      // hide its subtechniques too
+      document.querySelectorAll(`.matrix-subtech[data-parent="${extId}"]`).forEach(s => s.style.display = 'none');
+    } else {
+      el.style.display = '';
+      document.querySelectorAll(`.matrix-subtech[data-parent="${extId}"]`).forEach(s => s.style.display = '');
+    }
+  });
+}
+
+// ============================================================
+// 技术列表视图
+// ============================================================
+function renderTechniqueList() {
+  let html = '<h1 class="page-title">全部技术</h1>';
+  html += '<p class="page-subtitle">共 ' + Object.keys(D.techniques).length + ' 项技术（不含子技术）</p>';
+  html += '<input type="text" placeholder="筛选技术..." style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:4px;width:100%;max-width:400px;margin-bottom:12px;" oninput="filterCards(this.value)">';
+  html += '<div class="card-grid" id="tech-grid">';
+  const techs = Object.values(D.techniques).sort((a,b) => a.external_id.localeCompare(b.external_id));
+  techs.forEach(t => {
+    const subCount = t.external_id in D.all_techniques ? (Object.values(D.subtechniques).filter(s => s.parent_id === t.external_id).length) : 0;
+    html += `<div class="card" data-search="${t.name_cn} ${t.name} ${t.external_id}" onclick="showTechniqueDetail('${t.external_id}')">`;
+    html += `<div class="cid">${t.external_id}</div>`;
+    html += `<div class="cname">${t.name_cn}</div>`;
+    html += `<div style="color:var(--text-muted);font-size:0.7rem">${t.name}</div>`;
+    if (subCount > 0) html += `<div style="color:var(--accent);font-size:0.7rem">${subCount} 个子技术</div>`;
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('main-content').innerHTML = html;
+}
+
+function renderSubtechniqueList() {
+  let html = '<h1 class="page-title">全部子技术</h1>';
+  html += '<p class="page-subtitle">共 ' + Object.keys(D.subtechniques).length + ' 项子技术</p>';
+  html += '<input type="text" placeholder="筛选子技术..." style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:4px;width:100%;max-width:400px;margin-bottom:12px;" oninput="filterCards(this.value)">';
+  html += '<div class="card-grid" id="tech-grid">';
+  const subs = Object.values(D.subtechniques).sort((a,b) => a.external_id.localeCompare(b.external_id));
+  subs.forEach(s => {
+    html += `<div class="card" data-search="${s.name_cn} ${s.name} ${s.external_id}" onclick="showTechniqueDetail('${s.external_id}')">`;
+    html += `<div class="cid">${s.external_id}</div>`;
+    html += `<div class="cname">${s.name_cn}</div>`;
+    html += `<div style="color:var(--text-muted);font-size:0.7rem">${s.name}</div>`;
+    if (s.parent_id) html += `<div style="color:var(--text-secondary);font-size:0.7rem">父技术: ${s.parent_id}</div>`;
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('main-content').innerHTML = html;
+}
+
+// ============================================================
+// 战术列表视图
+// ============================================================
+function renderTacticList() {
+  let html = '<h1 class="page-title">全部战术</h1>';
+  html += '<p class="page-subtitle">共 ' + D.tactics.length + ' 个战术</p>';
+  html += '<div class="groups-grid">';
+  D.tactics.forEach(t => {
+    // 统计该战术下的技术数量
+    let techCount = 0;
+    for (const m of D.matrix) {
+      if (m.tactic.id === t.id) { techCount = m.techniques.length; break; }
+    }
+    html += `<div class="group-card" onclick="showTacticDetail('${t.id}')">`;
+    html += `<div class="gid">${t.external_id}</div>`;
+    html += `<div class="gname">${t.name_cn}</div>`;
+    html += `<div style="color:var(--text-muted);font-size:0.8rem">${t.name}</div>`;
+    html += `<div style="color:var(--accent);font-size:0.75rem;margin-top:4px">${techCount} 项技术</div>`;
+    html += `<div class="gdesc">${t.description_cn || t.description}</div>`;
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('main-content').innerHTML = html;
+}
+
+function showTacticDetail(tacticId) {
+  const t = D.tactics.find(x => x.id === tacticId);
+  if (!t) return;
+  let html = '<button class="detail-close" onclick="closeDetail()">✕</button>';
+  html += `<div class="detail-id">${t.external_id}</div>`;
+  html += `<div class="detail-name">${t.name_cn}</div>`;
+  html += `<div class="detail-name-cn">${t.name}</div>`;
+  html += `<div class="detail-section"><p class="desc">${t.description_cn || t.description}</p>`;
+  if (t.description_cn && t.description && t.description_cn !== t.description) {
+    html += `<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--text-secondary);font-size:0.8rem">查看英文原文</summary>`;
+    html += `<p class="desc" style="margin-top:4px;color:var(--text-muted);font-size:0.8rem">${t.description}</p></details>`;
+  }
+
+  // 列出该战术下的技术
+  let colData = null;
+  for (const m of D.matrix) {
+    if (m.tactic.id === t.id) { colData = m; break; }
+  }
+  if (colData) {
+    html += '<div class="detail-section"><h3>包含的技术 (' + colData.techniques.length + ')</h3>';
+    html += '<ul class="detail-list">';
+    colData.techniques.forEach(tech => {
+      html += `<li onclick="showTechniqueDetail('${tech.external_id}')">${tech.external_id} ${tech.name_cn}</li>`;
+    });
+    html += '</ul></div>';
+  }
+  showDetail(html);
+}
+
+// ============================================================
+// 技术/子技术详情
+// ============================================================
+function showTechniqueDetail(extId) {
+  const tech = techById[extId];
+  if (!tech) return;
+
+  // 查找该技术属于哪些战术
+  const tacticIds = D.tech_to_tactics[tech.id] || [];
+  const tacticNames = tacticIds.map(tid => {
+    const tac = D.tactics.find(x => x.id === tid);
+    return tac ? tac.name_cn : '';
+  }).filter(Boolean);
+
+  // 查找子技术
+  let subTechs = [];
+  if (!tech.is_subtechnique) {
+    subTechs = Object.values(D.subtechniques).filter(s => s.parent_id === extId);
+    subTechs.sort((a,b) => a.external_id.localeCompare(b.external_id));
+  }
+
+  // 查找父技术
+  let parentTech = null;
+  if (tech.is_subtechnique && tech.parent_id) {
+    parentTech = techById[tech.parent_id];
+  }
+
+  // 查找相关组织
+  const groupIds = D.tech_to_groups[tech.id] || [];
+  const relatedGroups = groupIds.map(gid => groupById[gid]).filter(Boolean);
+
+  // 查找相关软件
+  const swIds = D.tech_to_software[tech.id] || [];
+  const relatedSoftware = swIds.map(sid => malwareById[sid] || toolById[sid]).filter(Boolean);
+
+  // 查找缓解措施
+  const mitIds = D.tech_to_mitigations[tech.id] || [];
+  const relatedMitigations = mitIds.map(mid => mitigationById[mid]).filter(Boolean);
+
+  let html = '<button class="detail-close" onclick="closeDetail()">✕</button>';
+
+  // 面包屑
+  if (parentTech) {
+    html += `<div class="breadcrumb"><a onclick="showTechniqueDetail(\'${parentTech.external_id}\')">${parentTech.name_cn}</a> &gt; 子技术</div>`;
+  }
+
+  html += `<div class="detail-id">${tech.external_id}</div>`;
+  html += `<div class="detail-name">${tech.name_cn}</div>`;
+  html += `<div class="detail-name-cn">${tech.name}</div>`;
+
+  // 元标签
+  html += '<div class="detail-meta">';
+  (tech.platforms || []).forEach(p => { html += `<span class="detail-tag">${p}</span>`; });
+  (tech.permissions || []).forEach(p => { html += `<span class="detail-tag">需: ${p}</span>`; });
+  if (tech.is_subtechnique) html += '<span class="detail-tag">子技术</span>';
+  tacticNames.forEach(tn => { html += `<span class="detail-tag">${tn}</span>`; });
+  html += '</div>';
+
+  // 描述
+  if (tech.description_cn || tech.description) {
+    html += '<div class="detail-section"><h3>描述</h3>';
+    if (tech.description_cn) {
+      html += `<p class="desc">${tech.description_cn}</p>`;
+    }
+    if (tech.description && tech.description !== tech.description_cn) {
+      html += `<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--text-secondary);font-size:0.8rem">查看英文原文</summary>`;
+      html += `<p class="desc" style="margin-top:4px;color:var(--text-muted);font-size:0.8rem">${tech.description}</p></details>`;
+    }
+    html += '</div>';
+  }
+
+  // 子技术
+  if (subTechs.length > 0) {
+    html += `<div class="detail-section"><h3>子技术 (${subTechs.length})</h3>`;
+    html += '<ul class="detail-list">';
+    subTechs.forEach(s => {
+      html += `<li onclick="showTechniqueDetail('${s.external_id}')">${s.external_id} ${s.name_cn}</li>`;
+    });
+    html += '</ul></div>';
+  }
+
+  // 相关组织
+  if (relatedGroups.length > 0) {
+    html += `<div class="detail-section"><h3>使用此技术的组织 (${relatedGroups.length})</h3>`;
+    html += '<ul class="detail-list">';
+    relatedGroups.forEach(g => {
+      html += `<li onclick="showGroupDetail('${g.id}')">${g.external_id} ${g.name}</li>`;
+    });
+    html += '</ul></div>';
+  }
+
+  // 相关软件
+  if (relatedSoftware.length > 0) {
+    html += `<div class="detail-section"><h3>相关软件 (${relatedSoftware.length})</h3>`;
+    html += '<ul class="detail-list">';
+    relatedSoftware.forEach(s => {
+      const swType = s.id in D.malware ? '恶意软件' : '工具';
+      html += `<li onclick="showSoftwareDetail('${s.id}')">${s.external_id} ${s.name} [${swType}]</li>`;
+    });
+    html += '</ul></div>';
+  }
+
+  // 缓解措施
+  if (relatedMitigations.length > 0) {
+    html += `<div class="detail-section"><h3>缓解措施 (${relatedMitigations.length})</h3>`;
+    html += '<ul class="detail-list">';
+    relatedMitigations.forEach(m => {
+      html += `<li onclick="showMitigationDetail('${m.id}')">${m.external_id} ${m.name_cn || m.name}</li>`;
+    });
+    html += '</ul></div>';
+  }
+
+  // 原始链接
+  if (tech.url) {
+    html += `<div class="detail-section"><a href="${tech.url}" target="_blank" style="color:var(--accent);font-size:0.85rem;">查看原始 MITRE ATT&CK 页面 →</a></div>`;
+  }
+
+  showDetail(html);
+}
+
+// ============================================================
+// 组织详情
+// ============================================================
+function showGroupDetail(gid) {
+  const g = groupById[gid];
+  if (!g) return;
+
+  // 获取该组织使用的技术
+  const techIds = D.group_to_techs[g.id] || [];
+  const techs = techIds.map(tid => D.all_techniques[tid]).filter(Boolean);
+
+  let html = '<button class="detail-close" onclick="closeDetail()">✕</button>';
+  html += `<div class="detail-id">${g.external_id}</div>`;
+  html += `<div class="detail-name">${g.name}</div>`;
+  if (g.aliases && g.aliases.length > 0) {
+    html += `<div class="detail-name-cn">别名: ${g.aliases.join(', ')}</div>`;
+  }
+  if (g.description_cn || g.description) {
+    html += '<div class="detail-section"><h3>描述</h3>';
+    if (g.description_cn) {
+      html += `<p class="desc">${g.description_cn}</p>`;
+    }
+    if (g.description && g.description !== g.description_cn) {
+      html += '<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--text-secondary);font-size:0.8rem">查看英文原文</summary>';
+      html += `<p class="desc" style="margin-top:4px;color:var(--text-muted);font-size:0.8rem">${g.description}</p></details>`;
+    }
+    html += '</div>';
+  }
+  if (techs.length > 0) {
+    html += `<div class="detail-section"><h3>使用的技术 (${techs.length})</h3>`;
+    html += '<ul class="detail-list">';
+    techs.sort((a,b) => (a.external_id||'').localeCompare(b.external_id||'')).forEach(t => {
+      html += `<li onclick="showTechniqueDetail('${t.external_id}')">${t.external_id} ${t.name_cn}</li>`;
+    });
+    html += '</ul></div>';
+  }
+  showDetail(html);
+}
+
+// ============================================================
+// 软件详情
+// ============================================================
+function showSoftwareDetail(sid) {
+  const s = malwareById[sid] || toolById[sid];
+  if (!s) return;
+
+  let html = '<button class="detail-close" onclick="closeDetail()">✕</button>';
+  html += `<div class="detail-id">${s.external_id}</div>`;
+  html += `<div class="detail-name">${s.name}</div>`;
+  const swType = s.id in D.malware ? '恶意软件' : '工具';
+  html += `<div class="detail-meta"><span class="detail-tag">${swType}</span></div>`;
+  if (s.platforms) {
+    html += '<div class="detail-meta">';
+    s.platforms.forEach(p => { html += `<span class="detail-tag">${p}</span>`; });
+    html += '</div>';
+  }
+  if (s.description_cn || s.description) {
+    html += '<div class="detail-section"><h3>描述</h3>';
+    if (s.description_cn) {
+      html += `<p class="desc">${s.description_cn}</p>`;
+    }
+    if (s.description && s.description !== s.description_cn) {
+      html += '<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--text-secondary);font-size:0.8rem">查看英文原文</summary>';
+      html += `<p class="desc" style="margin-top:4px;color:var(--text-muted);font-size:0.8rem">${s.description}</p></details>`;
+    }
+    html += '</div>';
+  }
+  showDetail(html);
+}
+
+// ============================================================
+// 缓解措施详情
+// ============================================================
+function showMitigationDetail(mid) {
+  const m = mitigationById[mid];
+  if (!m) return;
+
+  let html = '<button class="detail-close" onclick="closeDetail()">✕</button>';
+  html += `<div class="detail-id">${m.external_id}</div>`;
+  html += `<div class="detail-name">${m.name_cn || m.name}</div>`;
+  html += `<div class="detail-name-cn">${m.name}</div>`;
+  if (m.description_cn || m.description) {
+    html += '<div class="detail-section"><h3>描述</h3>';
+    if (m.description_cn) {
+      html += `<p class="desc">${m.description_cn}</p>`;
+    }
+    if (m.description && m.description !== m.description_cn) {
+      html += '<details style="margin-top:8px"><summary style="cursor:pointer;color:var(--text-secondary);font-size:0.8rem">查看英文原文</summary>';
+      html += `<p class="desc" style="margin-top:4px;color:var(--text-muted);font-size:0.8rem">${m.description}</p></details>`;
+    }
+    html += '</div>';
+  }
+  showDetail(html);
+}
+
+// ============================================================
+// 组织列表
+// ============================================================
+function renderGroupList() {
+  let html = '<h1 class="page-title">攻击组织</h1>';
+  html += '<p class="page-subtitle">共 ' + Object.keys(D.groups).length + ' 个组织（入侵集）</p>';
+  html += '<input type="text" placeholder="筛选组织..." style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:4px;width:100%;max-width:400px;margin-bottom:12px;" oninput="filterCards(this.value)">';
+  html += '<div class="groups-grid" id="tech-grid">';
+  const groups = Object.values(D.groups).sort((a,b) => a.external_id.localeCompare(b.external_id));
+  groups.forEach(g => {
+    const techCount = (D.group_to_techs[g.id] || []).length;
+    html += `<div class="group-card" data-search="${g.name} ${(g.aliases||[]).join(' ')} ${g.external_id}" onclick="showGroupDetail('${g.id}')">`;
+    html += `<div class="gid">${g.external_id}</div>`;
+    html += `<div class="gname">${g.name}</div>`;
+    if (g.aliases && g.aliases.length > 0) {
+      html += `<div class="aliases">别名: ${g.aliases.join(', ')}</div>`;
+    }
+    html += `<div style="color:var(--accent);font-size:0.7rem;margin-top:2px">${techCount} 项技术</div>`;
+    if (g.description) {
+      html += `<div class="gdesc">${g.description.replace(/<[^>]+>/g, '').substring(0, 150)}...</div>`;
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('main-content').innerHTML = html;
+}
+
+// ============================================================
+// 软件列表
+// ============================================================
+function renderSoftwareList() {
+  let html = '<h1 class="page-title">软件</h1>';
+  const malwareList = Object.values(D.malware);
+  const toolList = Object.values(D.tools);
+  html += '<p class="page-subtitle">共 ' + malwareList.length + ' 个恶意软件 + ' + toolList.length + ' 个工具</p>';
+  html += '<input type="text" placeholder="筛选软件..." style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:4px;width:100%;max-width:400px;margin-bottom:12px;" oninput="filterCards(this.value)">';
+  html += '<h2 style="margin:12px 0 8px;font-size:1rem;color:var(--text-secondary)">恶意软件</h2>';
+  html += '<div class="card-grid" id="tech-grid">';
+  malwareList.sort((a,b) => a.external_id.localeCompare(b.external_id)).forEach(m => {
+    html += `<div class="card" data-search="${m.name} ${m.external_id}" onclick="showSoftwareDetail('${m.id}')">`;
+    html += `<div class="cid">${m.external_id}</div>`;
+    html += `<div class="cname">${m.name}</div>`;
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<h2 style="margin:16px 0 8px;font-size:1rem;color:var(--text-secondary)">工具</h2>';
+  html += '<div class="card-grid">';
+  toolList.sort((a,b) => a.external_id.localeCompare(b.external_id)).forEach(t => {
+    html += `<div class="card" data-search="${t.name} ${t.external_id}" onclick="showSoftwareDetail('${t.id}')">`;
+    html += `<div class="cid">${t.external_id}</div>`;
+    html += `<div class="cname">${t.name}</div>`;
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('main-content').innerHTML = html;
+}
+
+// ============================================================
+// 缓解措施列表
+// ============================================================
+function renderMitigationList() {
+  let html = '<h1 class="page-title">缓解措施</h1>';
+  html += '<p class="page-subtitle">共 ' + Object.keys(D.mitigations).length + ' 项缓解措施</p>';
+  html += '<input type="text" placeholder="筛选缓解措施..." style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:4px;width:100%;max-width:400px;margin-bottom:12px;" oninput="filterCards(this.value)">';
+  html += '<div class="card-grid" id="tech-grid">';
+  const mits = Object.values(D.mitigations).sort((a,b) => a.external_id.localeCompare(b.external_id));
+  mits.forEach(m => {
+    html += `<div class="card" data-search="${m.name_cn} ${m.name} ${m.external_id}" onclick="showMitigationDetail('${m.id}')">`;
+    html += `<div class="cid">${m.external_id}</div>`;
+    html += `<div class="cname">${m.name_cn || m.name}</div>`;
+    html += `<div style="color:var(--text-muted);font-size:0.7rem">${m.name}</div>`;
+    html += '</div>';
+  });
+  html += '</div>';
+  document.getElementById('main-content').innerHTML = html;
+}
+
+// ============================================================
+// 统计视图
+// ============================================================
+function renderStats() {
+  let html = '<h1 class="page-title">统计概览</h1>';
+  html += '<div class="stats-grid">';
+  html += `<div class="stat-card"><div class="num">${D.tactics.length}</div><div class="label">战术</div></div>`;
+  html += `<div class="stat-card"><div class="num">${Object.keys(D.techniques).length}</div><div class="label">技术</div></div>`;
+  html += `<div class="stat-card"><div class="num">${Object.keys(D.subtechniques).length}</div><div class="label">子技术</div></div>`;
+  html += `<div class="stat-card"><div class="num">${Object.keys(D.groups).length}</div><div class="label">组织</div></div>`;
+  html += `<div class="stat-card"><div class="num">${Object.keys(D.malware).length}</div><div class="label">恶意软件</div></div>`;
+  html += `<div class="stat-card"><div class="num">${Object.keys(D.tools).length}</div><div class="label">工具</div></div>`;
+  html += `<div class="stat-card"><div class="num">${Object.keys(D.mitigations).length}</div><div class="label">缓解措施</div></div>`;
+  html += '</div>';
+
+  // 每个战术的技术数量图表
+  html += '<h2 style="margin-top:20px">各战术技术数量分布</h2>';
+  html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">';
+  D.matrix.forEach((col, ci) => {
+    const colors = ['#c6362a','#e0601c','#d4950b','#5b9e16','#179e8c','#2b9eb3','#2e7fb0','#5b5fcf','#8b5fcf','#b55fcf','#c94f6f','#c94f84','#b8473c','#9370a5','#5c8a6d'];
+    const count = col.techniques.length;
+    html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px;text-align:center;flex:1;min-width:100px;">`;
+    html += `<div style="font-weight:700;font-size:1.2rem;color:${colors[ci]}">${count}</div>`;
+    html += `<div style="font-size:0.75rem;color:var(--text-secondary)">${col.tactic.name_cn}</div>`;
+    html += '</div>';
+  });
+  html += '</div>';
+
+  document.getElementById('main-content').innerHTML = html;
+}
+
+// ============================================================
+// 搜索
+// ============================================================
+function doSearch(query) {
+  const container = document.getElementById('search-results');
+  if (!query || query.length < 1) {
+    container.classList.remove('show');
+    return;
+  }
+  const q = query.toLowerCase();
+
+  // 搜索技术
+  let results = [];
+  for (const t of Object.values(D.all_techniques)) {
+    if (t.name.toLowerCase().includes(q) || t.name_cn.includes(q) || t.external_id.toLowerCase().includes(q)) {
+      // 找到该技术所属的战术
+      const tacticIds = D.tech_to_tactics[t.id] || [];
+      const tacticNames = tacticIds.map(tid => {
+        const tac = D.tactics.find(x => x.id === tid);
+        return tac ? tac.name_cn : '';
+      }).filter(Boolean);
+      results.push({
+        type: t.is_subtechnique ? '子技术' : '技术',
+        id: t.external_id,
+        name: t.name_cn,
+        nameEn: t.name,
+        tactic: tacticNames.join(', '),
+        refType: 'technique',
+        refId: t.external_id,
+      });
+    }
+  }
+
+  // 搜索组织
+  for (const g of Object.values(D.groups)) {
+    if (g.name.toLowerCase().includes(q) || g.external_id.toLowerCase().includes(q) || (g.aliases||[]).some(a => a.toLowerCase().includes(q))) {
+      results.push({
+        type: '组织',
+        id: g.external_id,
+        name: g.name,
+        nameEn: '',
+        tactic: (g.aliases||[]).join(', '),
+        refType: 'group',
+        refId: g.id,
+      });
+    }
+  }
+
+  // 搜索软件
+  for (const m of Object.values(D.malware)) {
+    if (m.name.toLowerCase().includes(q) || m.external_id.toLowerCase().includes(q)) {
+      results.push({
+        type: '恶意软件',
+        id: m.external_id,
+        name: m.name,
+        nameEn: '',
+        tactic: '',
+        refType: 'software',
+        refId: m.id,
+      });
+    }
+  }
+  for (const t of Object.values(D.tools)) {
+    if (t.name.toLowerCase().includes(q) || t.external_id.toLowerCase().includes(q)) {
+      results.push({
+        type: '工具',
+        id: t.external_id,
+        name: t.name,
+        nameEn: '',
+        tactic: '',
+        refType: 'software',
+        refId: t.id,
+      });
+    }
+  }
+
+  // 限制结果数量
+  results = results.slice(0, 50);
+
+  let html = '';
+  results.forEach((r, i) => {
+    const escapedId = (r.refId || '').replace(/"/g, '&quot;');
+    html += `<div class="search-item" data-ref-type="${r.refType}" data-ref-id="${escapedId}" onclick="clickSearchResult(this)">`;
+    html += `<span class="id">[${r.type}] ${r.id}</span> `;
+    html += `<span class="name">${r.name}</span>`;
+    if (r.nameEn) html += ` <span style="color:var(--text-muted);font-size:0.7rem">${r.nameEn}</span>`;
+    if (r.tactic) html += `<br><span class="tactic">${r.tactic}</span>`;
+    html += '</div>';
+  });
+
+  if (results.length === 0) {
+    html = '<div class="search-item" style="color:var(--text-muted)">未找到结果</div>';
+  }
+
+  container.innerHTML = html;
+  container.classList.add('show');
+}
+
+function closeSearch() {
+  document.getElementById('search-results').classList.remove('show');
+  document.getElementById('search-input').value = '';
+}
+
+function clickSearchResult(el) {
+  closeSearch();
+  const refType = el.dataset.refType;
+  const refId = el.dataset.refId.replace(/&quot;/g, '"');
+  switch(refType) {
+    case 'technique': showTechniqueDetail(refId); break;
+    case 'group': showGroupDetail(refId); break;
+    case 'software': showSoftwareDetail(refId); break;
+    case 'mitigation': showMitigationDetail(refId); break;
+  }
+}
+
+// ============================================================
+// 详情浮层
+// ============================================================
+function showDetail(html) {
+  document.getElementById('detail-panel').innerHTML = html;
+  document.getElementById('detail-overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDetail() {
+  document.getElementById('detail-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// ============================================================
+// 通用筛选
+// ============================================================
+function filterCards(query) {
+  const q = query.toLowerCase();
+  document.querySelectorAll('#tech-grid .card, #tech-grid .group-card').forEach(card => {
+    const searchData = (card.dataset.search || '').toLowerCase();
+    if (!q || searchData.includes(q)) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+// ============================================================
+// 键盘快捷键
+// ============================================================
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeDetail();
+    closeSearch();
+  }
+  // Ctrl+K 或 / 聚焦搜索
+  if ((e.ctrlKey && e.key === 'k') || (e.key === '/' && !e.target.closest('input'))) {
+    e.preventDefault();
+    document.getElementById('search-input').focus();
+  }
+});
+
+// ============================================================
+// 初始化
+// ============================================================
+showView('matrix');
+</script>
+</body>
+</html>
