@@ -121,6 +121,16 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto
 .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px; text-align: center; }
 .stat-card .num { font-size: 2rem; font-weight: 700; color: var(--accent); }
 .stat-card .label { font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px; }
+.stat-card .num.small { font-size: 1.2rem; }
+.ref-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; margin-top: 8px; }
+.ref-link { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 10px 14px; text-decoration: none; color: var(--text); transition: border-color 0.2s; }
+.ref-link:hover { border-color: var(--accent); }
+.ref-link .ref-icon { font-size: 1.2rem; flex-shrink: 0; }
+.ref-link .ref-info { flex: 1; min-width: 0; }
+.ref-link .ref-title { font-size: 0.85rem; font-weight: 600; }
+.ref-link .ref-desc { font-size: 0.7rem; color: var(--text-secondary); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gh-link { display: inline-flex; align-items: center; gap: 4px; color: var(--text-secondary); text-decoration: none; font-size: 0.85rem; padding: 4px 10px; border: 1px solid var(--border); border-radius: 4px; margin-left: 10px; transition: all 0.2s; }
+.gh-link:hover { color: var(--text); border-color: var(--accent); }
 
 /* ===== 工具提示 ===== */
 .tooltip { position: relative; }
@@ -160,6 +170,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto
       <a href="#" data-view="stats" onclick="showView('stats')">统计</a>
     </div>
     <div class="topnav-search">
+      <a href="https://github.com/CoHyu/ATT-CK-in-CN" target="_blank" rel="noopener" class="gh-link" title="GitHub 项目">&#9733; GitHub</a>
       <input type="text" id="search-input" placeholder="搜索技术/组织/软件..." oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape'){this.value='';doSearch('');this.blur();}">
       <div class="search-results" id="search-results"></div>
     </div>
@@ -728,6 +739,7 @@ function renderStats() {
   html += `<div class="stat-card"><div class="num">${Object.keys(D.malware).length}</div><div class="label">恶意软件</div></div>`;
   html += `<div class="stat-card"><div class="num">${Object.keys(D.tools).length}</div><div class="label">工具</div></div>`;
   html += `<div class="stat-card"><div class="num">${Object.keys(D.mitigations).length}</div><div class="label">缓解措施</div></div>`;
+  html += `<div class="stat-card"><div class="num small" id="visit-count">...</div><div class="label">页面访问量</div></div>`;
   html += '</div>';
 
   // 每个战术的技术数量图表
@@ -743,7 +755,41 @@ function renderStats() {
   });
   html += '</div>';
 
+  // 外部参考链接
+  html += '<h2 style="margin-top:20px">相关资源</h2>';
+  html += '<div class="ref-links">';
+  const refs = [
+    { title: 'MITRE ATT&CK 官网', desc: '官方知识库，英文原版', url: 'https://attack.mitre.org/', icon: '🏛' },
+    { title: 'ATT&CK Navigator', desc: '在线矩阵可视化与导航工具', url: 'https://mitre-attack.github.io/attack-navigator/', icon: '🧭' },
+    { title: 'ATT&CK STIX Data', desc: 'STIX 2.0 格式原始数据仓库', url: 'https://github.com/mitre-attack/attack-stix-data', icon: '📦' },
+    { title: 'ATT&CK for ICS', desc: '工控系统 ATT&CK 知识库', url: 'https://attack.mitre.org/matrices/ics/', icon: '🏭' },
+    { title: 'ATT&CK for Mobile', desc: '移动安全 ATT&CK 知识库', url: 'https://attack.mitre.org/matrices/mobile/', icon: '📱' },
+    { title: 'D3FEND 防御矩阵', desc: 'MITRE 网络防御技术知识库', url: 'https://d3fend.mitre.org/', icon: '🛡' },
+    { title: 'CVE 漏洞库', desc: '通用漏洞与暴露编号系统', url: 'https://cve.mitre.org/', icon: '🔖' },
+    { title: 'NVD 国家漏洞库', desc: '美国国家漏洞数据库', url: 'https://nvd.nist.gov/', icon: '📋' },
+    { title: '本项目中 GitHub', desc: 'ATT&CK in CN 开源汉化项目', url: 'https://github.com/CoHyu/ATT-CK-in-CN', icon: '⭐' },
+  ];
+  refs.forEach(r => {
+    html += `<a href="${r.url}" target="_blank" rel="noopener" class="ref-link">`;
+    html += `<span class="ref-icon">${r.icon}</span>`;
+    html += `<span class="ref-info"><div class="ref-title">${r.title}</div><div class="ref-desc">${r.desc}</div></span>`;
+    html += '</a>';
+  });
+  html += '</div>';
+
   document.getElementById('main-content').innerHTML = html;
+
+  // 异步获取访问量
+  fetch('https://api.countapi.xyz/hit/cohyu-attck-cn/visits')
+    .then(r => r.json())
+    .then(data => {
+      const el = document.getElementById('visit-count');
+      if (el) { el.textContent = data.value; el.classList.remove('small'); }
+    })
+    .catch(() => {
+      const el = document.getElementById('visit-count');
+      if (el) el.textContent = '-';
+    });
 }
 
 // ============================================================
