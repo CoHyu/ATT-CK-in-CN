@@ -780,11 +780,11 @@ function renderStats() {
   document.getElementById('main-content').innerHTML = html;
 
   // 异步获取访问量
-  fetch('https://api.countapi.xyz/hit/cohyu-attck-cn/visits')
+  fetch('https://api.counterapi.dev/v1/cohyu-attck-cn/visits/up')
     .then(r => r.json())
     .then(data => {
       const el = document.getElementById('visit-count');
-      if (el) { el.textContent = data.value; el.classList.remove('small'); }
+      if (el) { el.textContent = data.count; el.classList.remove('small'); }
     })
     .catch(() => {
       const el = document.getElementById('visit-count');
