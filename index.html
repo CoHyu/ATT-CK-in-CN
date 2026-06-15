@@ -194,9 +194,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto
 .tooltip:hover::after { opacity: 1; }
 
 /* ===== SEO 页脚 ===== */
-.seo-footer { background: var(--surface); border-top: 1px solid var(--border); margin-top: 24px; padding: 24px 16px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8; }
-.seo-footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-.seo-footer h2 { font-size: 0.95rem; color: var(--text); margin-bottom: 6px; }
+.seo-footer { background: var(--surface); border-top: 1px solid var(--border); margin-top: 24px; }
+.seo-footer details { padding: 0 16px; }
+.seo-footer summary { padding: 8px 0; font-size: 0.75rem; color: var(--text-muted); cursor: pointer; user-select: none; outline: none; }
+.seo-footer summary:hover { color: var(--text-secondary); }
+.seo-footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; padding-bottom: 16px; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.8; }
+.seo-footer h2 { font-size: 0.88rem; color: var(--text); margin-bottom: 4px; }
 .seo-footer strong { color: var(--text); }
 
 /* ===== 响应式 ===== */
@@ -251,22 +254,25 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto
   </noscript>
 </div>
 
-<!-- SEO 页脚 — 搜索引擎可索引的静态文本 -->
+<!-- SEO 页脚 — 搜索引擎可索引的静态文本，默认折叠 -->
 <footer class="seo-footer">
-  <div class="seo-footer-inner">
-    <div class="seo-footer-col">
-      <h2>关于 MITRE ATT&CK 中文版</h2>
-      <p>本网站是 <strong>MITRE ATT&CK 知识库的完整中文汉化版</strong>（ATT&CK in CN），提供<strong>最全面、最准确的 MITRE ATT&CK 中文翻译</strong>。ATT&amp;CK（Adversarial Tactics, Techniques, and Common Knowledge，对手战术、技术与通用知识）是 MITRE 公司维护的全球公认网络安全威胁情报框架，被世界各地的安全团队用于威胁建模、红蓝对抗、安全评估和威胁狩猎。</p>
+  <details>
+    <summary>关于本站 · MITRE ATT&CK 中文版</summary>
+    <div class="seo-footer-inner">
+      <div class="seo-footer-col">
+        <h2>关于 MITRE ATT&CK 中文版</h2>
+        <p>本网站是 <strong>MITRE ATT&CK 知识库的完整中文汉化版</strong>（ATT&CK in CN），提供<strong>最全面、最准确的 MITRE ATT&CK 中文翻译</strong>。ATT&amp;CK（Adversarial Tactics, Techniques, and Common Knowledge，对手战术、技术与通用知识）是 MITRE 公司维护的全球公认网络安全威胁情报框架，被世界各地的安全团队用于威胁建模、红蓝对抗、安全评估和威胁狩猎。</p>
+      </div>
+      <div class="seo-footer-col">
+        <h2>涵盖内容</h2>
+        <p>本中文版 ATT&CK 知识库完整覆盖了 Enterprise 矩阵的全部 <strong>15 个战术</strong>（包括侦察、资源开发、初始访问、执行、持久化、权限提升、防御规避、凭据访问、发现、横向移动、收集、命令与控制、数据外泄、影响等）、<strong>846 项技术/子技术</strong>、<strong>189 个 APT 威胁组织</strong>、<strong>728 个恶意软件家族</strong>、<strong>95 个攻击工具</strong> 以及 <strong>44 项缓解措施</strong>。所有描述均采用专业中文翻译，同时保留英文原文方便对照。</p>
+      </div>
+      <div class="seo-footer-col">
+        <h2>使用方式</h2>
+        <p>本 MITRE ATT&CK 汉化版为纯静态网站，<strong>无需服务器即可离线使用</strong>。打开即用，适合在安全隔离环境中部署。支持按战术/技术/组织/软件/缓解措施分类浏览，提供全文搜索功能。项目完全开源，托管于 GitHub Pages。如果您从事网络安全、渗透测试、红蓝对抗、威胁情报分析或安全运营工作，本 ATT&CK 中文知识库将成为您的得力工具。</p>
+      </div>
     </div>
-    <div class="seo-footer-col">
-      <h2>涵盖内容</h2>
-      <p>本中文版 ATT&CK 知识库完整覆盖了 Enterprise 矩阵的全部 <strong>15 个战术</strong>（包括侦察、资源开发、初始访问、执行、持久化、权限提升、防御规避、凭据访问、发现、横向移动、收集、命令与控制、数据外泄、影响等）、<strong>846 项技术/子技术</strong>、<strong>189 个 APT 威胁组织</strong>、<strong>728 个恶意软件家族</strong>、<strong>95 个攻击工具</strong> 以及 <strong>44 项缓解措施</strong>。所有描述均采用专业中文翻译，同时保留英文原文方便对照。</p>
-    </div>
-    <div class="seo-footer-col">
-      <h2>使用方式</h2>
-      <p>本 MITRE ATT&CK 汉化版为纯静态网站，<strong>无需服务器即可离线使用</strong>。打开即用，适合在安全隔离环境中部署。支持按战术/技术/组织/软件/缓解措施分类浏览，提供全文搜索功能。项目完全开源，托管于 GitHub Pages。如果您从事网络安全、渗透测试、红蓝对抗、威胁情报分析或安全运营工作，本 ATT&CK 中文知识库将成为您的得力工具。</p>
-    </div>
-  </div>
+  </details>
 </footer>
 
 <!-- 详情浮层 -->
