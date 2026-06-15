@@ -3,16 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MITRE ATT&CK 中文版 - 完整汉化知识库 | ATT&CK in CN</title>
-<meta name="description" content="MITRE ATT&CK 知识库完整中文汉化版，包含14个战术、846个技术、189个威胁组织、728个恶意软件、95个工具、44个缓解措施的准确中文翻译。支持本地离线浏览，无需服务器。">
-<meta name="keywords" content="MITRE ATT&CK,ATT&CK中文版,ATT&CK汉化,网络安全,威胁情报,攻击矩阵,APT组织,恶意软件,渗透测试,红队,蓝队">
-<meta property="og:title" content="MITRE ATT&CK 中文版 - 完整汉化知识库">
-<meta property="og:description" content="包含所有战术/技术/组织/恶意软件/工具/缓解措施的准确中文翻译，支持离线浏览。">
+<title>MITRE ATT&CK 中文版 — 完整汉化知识库 | 离线可用 | ATT&CK in CN</title>
+<meta name="description" content="MITRE ATT&CK 中文版 — 最完整的汉化知识库。涵盖15个战术、846项技术、189个APT组织、728个恶意软件家族、95个工具、44个缓解措施的中文翻译。支持离线浏览，无需服务器部署。ATT&CK 中文、ATT&CK 汉化、网络安全威胁情报矩阵。">
+<meta name="keywords" content="MITRE ATT&CK 中文版,ATT&CK汉化,ATT&CK中文,ATT&CK矩阵,ATT&CK知识库,中文ATT&CK,网络安全,威胁情报,攻击矩阵,APT组织,恶意软件分析,渗透测试,红蓝对抗,威胁狩猎">
+<meta name="author" content="ATT&CK in CN">
+<meta name="theme-color" content="#0f1117">
+<meta property="og:title" content="MITRE ATT&CK 中文版 — 完整汉化知识库 | ATT&CK in CN">
+<meta property="og:description" content="最全面的 MITRE ATT&CK 中文翻译：15个战术、846项技术、189个组织、728个恶意软件、95个工具、44个缓解措施。离线可用，持续更新。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://cohyu.github.io/ATT-CK-in-CN/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:site_name" content="ATT&CK in CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MITRE ATT&CK 中文版 — 完整汉化知识库">
+<meta name="twitter:description" content="最全面的 MITRE ATT&CK 中文知识库。15个战术、846项技术、189个组织全部汉化，支持离线浏览。">
 <meta name="google-site-verification" content="SKv15heAUTOzkLPNK7CmlTg8IDuQg8GjmX4q0fth0Go">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://cohyu.github.io/ATT-CK-in-CN/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "ATT&CK in CN — MITRE ATT&CK 中文版",
+  "url": "https://cohyu.github.io/ATT-CK-in-CN/",
+  "description": "MITRE ATT&CK 知识库完整中文汉化版，涵盖战术、技术、组织、恶意软件、工具与缓解措施。支持离线浏览。",
+  "applicationCategory": "SecurityApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "zh-CN",
+  "about": {
+    "@type": "Thing",
+    "name": "MITRE ATT&CK",
+    "description": "全球公认的对手战术、技术与通用知识库（Adversarial Tactics, Techniques, and Common Knowledge）"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "CoHyu"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [{
+    "@type": "Question",
+    "name": "什么是 MITRE ATT&CK？",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "MITRE ATT&CK 是全球公认的对手战术、技术与通用知识库，用于描述网络攻击者在入侵过程中使用的战术、技术和过程，是网络安全领域最重要的威胁情报框架之一。"
+    }
+  }, {
+    "@type": "Question",
+    "name": "ATT&CK in CN 是什么？",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "ATT&CK in CN 是 MITRE ATT&CK 知识库的完整中文汉化版，覆盖全部15个战术、846项技术、189个威胁组织、728个恶意软件和95个工具的准确中文翻译，支持离线浏览。"
+    }
+  }, {
+    "@type": "Question",
+    "name": "如何使用 ATT&CK 矩阵？",
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "从矩阵视图开始浏览14个战术（列），每列下列出相关技术。点击技术可查看详细描述、检测建议和缓解措施。也可按组织、软件、缓解措施分类浏览，或使用搜索功能快速定位。"
+    }
+  }]
+}
+</script>
 <style>
 /* ===== 基础样式 ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -137,6 +193,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto
 .tooltip::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #000; color: #fff; padding: 4px 8px; border-radius: 3px; font-size: 0.7rem; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; }
 .tooltip:hover::after { opacity: 1; }
 
+/* ===== SEO 页脚 ===== */
+.seo-footer { background: var(--surface); border-top: 1px solid var(--border); margin-top: 24px; padding: 24px 16px; font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8; }
+.seo-footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.seo-footer h2 { font-size: 0.95rem; color: var(--text); margin-bottom: 6px; }
+.seo-footer strong { color: var(--text); }
+
 /* ===== 响应式 ===== */
 @media (max-width: 768px) {
   .topnav-links { display: none; }
@@ -179,8 +241,33 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto
 
 <!-- 主内容区 -->
 <div class="main-content" id="main-content">
-  <!-- 由 JS 动态渲染 -->
+  <noscript>
+    <div style="padding:20px;text-align:center;">
+      <h1>MITRE ATT&CK 中文版 — 完整汉化知识库</h1>
+      <p>最全面的 MITRE ATT&CK 中文翻译，涵盖15个战术、846项技术、189个APT组织、728个恶意软件、95个工具、44个缓解措施。</p>
+      <p>ATT&CK（对手战术、技术与通用知识）是 MITRE 公司维护的全球公认网络安全威胁情报框架。</p>
+      <p>本站为纯静态网站，开启 JavaScript 即可获得完整交互体验。项目开源托管于 GitHub Pages。</p>
+    </div>
+  </noscript>
 </div>
+
+<!-- SEO 页脚 — 搜索引擎可索引的静态文本 -->
+<footer class="seo-footer">
+  <div class="seo-footer-inner">
+    <div class="seo-footer-col">
+      <h2>关于 MITRE ATT&CK 中文版</h2>
+      <p>本网站是 <strong>MITRE ATT&CK 知识库的完整中文汉化版</strong>（ATT&CK in CN），提供<strong>最全面、最准确的 MITRE ATT&CK 中文翻译</strong>。ATT&amp;CK（Adversarial Tactics, Techniques, and Common Knowledge，对手战术、技术与通用知识）是 MITRE 公司维护的全球公认网络安全威胁情报框架，被世界各地的安全团队用于威胁建模、红蓝对抗、安全评估和威胁狩猎。</p>
+    </div>
+    <div class="seo-footer-col">
+      <h2>涵盖内容</h2>
+      <p>本中文版 ATT&CK 知识库完整覆盖了 Enterprise 矩阵的全部 <strong>15 个战术</strong>（包括侦察、资源开发、初始访问、执行、持久化、权限提升、防御规避、凭据访问、发现、横向移动、收集、命令与控制、数据外泄、影响等）、<strong>846 项技术/子技术</strong>、<strong>189 个 APT 威胁组织</strong>、<strong>728 个恶意软件家族</strong>、<strong>95 个攻击工具</strong> 以及 <strong>44 项缓解措施</strong>。所有描述均采用专业中文翻译，同时保留英文原文方便对照。</p>
+    </div>
+    <div class="seo-footer-col">
+      <h2>使用方式</h2>
+      <p>本 MITRE ATT&CK 汉化版为纯静态网站，<strong>无需服务器即可离线使用</strong>。打开即用，适合在安全隔离环境中部署。支持按战术/技术/组织/软件/缓解措施分类浏览，提供全文搜索功能。项目完全开源，托管于 GitHub Pages。如果您从事网络安全、渗透测试、红蓝对抗、威胁情报分析或安全运营工作，本 ATT&CK 中文知识库将成为您的得力工具。</p>
+    </div>
+  </div>
+</footer>
 
 <!-- 详情浮层 -->
 <div class="detail-overlay" id="detail-overlay" onclick="if(event.target===this)closeDetail()">
@@ -259,8 +346,8 @@ function showView(view, params) {
 function renderMatrix() {
   const tacticColors = ['#c6362a','#e0601c','#d4950b','#5b9e16','#179e8c','#2b9eb3','#2e7fb0','#5b5fcf','#8b5fcf','#b55fcf','#c94f6f','#c94f84','#b8473c','#9370a5','#5c8a6d'];
 
-  let html = '<h1 class="page-title">Enterprise ATT&CK 矩阵</h1>';
-  html += '<p class="page-subtitle">MITRE ATT&CK 企业矩阵中文版 — 共 15 个战术、' + Object.keys(D.techniques).length + ' 项技术、' + Object.keys(D.subtechniques).length + ' 项子技术</p>';
+  let html = '<h1 class="page-title">MITRE ATT&CK 中文版 — 企业攻击矩阵</h1>';
+  html += '<p class="page-subtitle">最全面的 ATT&CK 中文知识库，涵盖 ' + D.tactics.length + ' 个战术、' + Object.keys(D.techniques).length + ' 项技术、' + Object.keys(D.subtechniques).length + ' 项子技术，全部中文汉化，离线可用</p>';
   html += '<div class="controls">';
   html += '<button onclick="toggleSubtechniques()" id="btn-subs" class="' + (showSubtechniques ? 'active' : '') + '">显示/隐藏子技术</button>';
   html += '<button onclick="expandAll()">展开全部子技术</button>';
@@ -739,7 +826,7 @@ function renderStats() {
   html += `<div class="stat-card"><div class="num">${Object.keys(D.malware).length}</div><div class="label">恶意软件</div></div>`;
   html += `<div class="stat-card"><div class="num">${Object.keys(D.tools).length}</div><div class="label">工具</div></div>`;
   html += `<div class="stat-card"><div class="num">${Object.keys(D.mitigations).length}</div><div class="label">缓解措施</div></div>`;
-  html += `<div class="stat-card"><div class="num small" id="visit-count">...</div><div class="label">页面访问量</div></div>`;
+  html += `<div class="stat-card"><div class="num small" id="visit-count">${visitCount !== null ? visitCount : '...'}</div><div class="label">页面访问量</div></div>`;
   html += '</div>';
 
   // 每个战术的技术数量图表
@@ -778,18 +865,6 @@ function renderStats() {
   html += '</div>';
 
   document.getElementById('main-content').innerHTML = html;
-
-  // 异步获取访问量
-  fetch('https://api.counterapi.dev/v1/cohyu-attck-cn/visits/up')
-    .then(r => r.json())
-    .then(data => {
-      const el = document.getElementById('visit-count');
-      if (el) { el.textContent = data.count; el.classList.remove('small'); }
-    })
-    .catch(() => {
-      const el = document.getElementById('visit-count');
-      if (el) el.textContent = '-';
-    });
 }
 
 // ============================================================
@@ -950,6 +1025,15 @@ document.addEventListener('keydown', function(e) {
     document.getElementById('search-input').focus();
   }
 });
+
+// ============================================================
+// 全局：页面访问量
+// ============================================================
+let visitCount = null;
+fetch('https://api.counterapi.dev/v1/cohyu-attck-cn/visits/up')
+  .then(r => r.json())
+  .then(data => { visitCount = data.count; })
+  .catch(() => { visitCount = '-'; });
 
 // ============================================================
 // 初始化
